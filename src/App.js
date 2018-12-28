@@ -7,6 +7,13 @@ import TextField from 'material-ui/TextField';
 import {Card, CardHeader, CardText} from 'material-ui/Card';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
+import axios from 'axios';
+import queryString from 'query-string'
+
+const api = axios.create({
+	withCredentials: true,
+  crossDomain: true
+});
 
 
 export const App = () => (
@@ -28,27 +35,24 @@ export const App = () => (
 async function get_minerals(callback)
 {
 
-    console.log("Querying mineral multibuy")
-    const response = await fetch('http://127.0.0.1:5000/multibuy_minerals', { credentials: 'include'});
-    // console.log(response);
-    const minerals = response.json();
-    console.log("Got mineral response")
-    console.log(minerals);
+    // console.log("Querying mineral multibuy")
+    const minerals = api.get('http://127.0.0.1:5000/multibuy_minerals');
+    // console.log("Got mineral response")
+    // console.log(minerals);
 
     let mineral_result = minerals.then(data => callback(data));
 
-    mineral_result.then(() => console.log(minerals.json));
+    // mineral_result.then(() => console.log(minerals.json));
 }
 
 async function get_ore(callback)
 {
 
-  console.log("Querying ore multibuy")
-  const response = await fetch('http://127.0.0.1:5000/multibuy_ore', { credentials: 'include'});
+  // console.log("Querying ore multibuy")
+  const ore = api.get('http://127.0.0.1:5000/multibuy_ore');
   // console.log(response);
-  const ore = response.json();
-  console.log("Got ore response");
-  console.log(ore);
+  // console.log("Got ore response");
+  // console.log(ore);
   ore.then(data => callback(data));
 
 }
@@ -61,7 +65,7 @@ export class Multibuy extends Component {
   clearSession() {
 
     console.log("Clearing session")
-    fetch('http://127.0.0.1:5000/clear', { credentials: 'include'});
+    api.get('http://127.0.0.1:5000/clear');
     // console.log(this);
     // delete this.state;
     this.setState({minerals: false, ore: false});
@@ -127,8 +131,8 @@ export class NameForm extends Component {
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
 
-
-    fetch('http://127.0.0.1:5000/clear', { credentials: 'include'});
+    api.defaults.withCredentials = true
+    api.get('http://127.0.0.1:5000/clear', {withCredentials: true});
 
   }
 
@@ -145,28 +149,19 @@ export class NameForm extends Component {
   handleSubmit = async e => {
     e.preventDefault();
 
-    var data = {};
-    data.item = this.state.item_name;
-    data.quantity = this.state.item_quantity;
+    const post_data = {item: this.state.item_name, quantity: this.state.item_quantity};
+    // data.item = this.state.item_name;
+    // data.quantity = this.state.item_quantity;
     console.log("Sending submit");
-    const response = await fetch('http://127.0.0.1:5000/post_test', {
-      credentials: 'include',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(
-        { data }),
-    });
-    console.log("Response:");
-    console.log(response);
-    const body = await response.text();
-    // const response_json = response.json()
-    console.log(body)
-    // body.then(() => console.log("Finished"));
-    this.setState({ responseToPost: body });
 
-    this.setState({ processing: true});
+    api.post('http://127.0.0.1:5000/post_test', post_data);
+    // console.log("Response:");
+    // console.log(response);
+
+    this.setState({responseToPost: "Analyzing manufacturing requirements for  " +
+      this.state.item_quantity + " " + this.state.item_name + "(s)"});
+
+    console.log(this.state)
   };
 
   render() {
