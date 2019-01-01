@@ -1,0 +1,1 @@
+/home/jd/projects/shekelator/eve_utils.py
