@@ -15,10 +15,11 @@ app.secret_key = b'123456782'
 Session(app)
 CORS(app, supports_credentials=True, resources={r"/*": {"origins": "*"}})
 
-# session = {"item": None, "quantity": None, "multibuy_minerals": None}
+import os
+dir = os.path.dirname(os.path.realpath(__file__))
+shekel_path = os.path.join(dir, 'shekelator/')
+sys.path.append(shekel_path)
 
-shekelator_path = './'
-sys.path.append(shekelator_path)
 from shekelator import analyze
 
 @app.after_request
