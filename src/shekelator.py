@@ -1,1 +1,0 @@
-/home/jd/projects/shekelator/shekelator.py
