@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
+// import logo from './logo.svg';
 import './App.css';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -11,16 +11,18 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import {  Table,  TableBody,  TableHeader,  TableHeaderColumn,  TableRow,  TableRowColumn,} from 'material-ui/Table';
 
 
+// <img src={logo} className="App-logo" alt="logo" />
 export const App = () => (
 
   <div className="App">
     <header className="App-header">
-      <img src={logo} className="App-logo" alt="logo" />
+    <h1>≡v≡ Industry Analysis</h1>
       <p>
         Enter an item name and click Submit to calculate manufacturing requirements.
       </p>
+
       <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
-        <NameForm />
+      <NameForm />
       </MuiThemeProvider>
     </header>
   </div>
@@ -59,11 +61,8 @@ export class MaterialTable extends Component {
     }
 
     createTable() {
-      console.log('Creating table with ' + this.state.material_table);
-      console.log('Element test: ' + this.state.material_table[0][0]);
-      // console.log("Creating table with " + this.state.material_table);
+      console.log("Creating table")
       let table = []
-      // console.log("Table is " + this.state.material_table)
 
       // Outer loop to create parent
       for (let i = 0; i < 8; i++) {
@@ -85,23 +84,39 @@ export class MaterialTable extends Component {
     }
 
     render(){
+
+      let tableHeader:any = {
+            fontSize: '18px',
+            fontWeight: 'bold',
+            textAlign: 'right',
+        };
+      let mineralHeader:any = {
+            fontSize: '18px',
+            fontWeight: 'bold',
+            textAlign: 'left',
+        };
+
       return (
         <>
       {
         this.state && this.state.material_table &&
-        <Table  selectable={false} style={{width:500}}>
-        <TableHeader displaySelectAll={false}>
+        <>
+        <h2>Reprocessing analysis</h2>
+        <p>If you were to buy the ores listed above and reprocess them:</p>
+        <Table  selectable={false} style={{margin: 'auto', tableLayout: 'auto'}}>
+        <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
           <TableRow>
-        		<TableHeaderColumn style={{textAlign: 'left'}}>Mineral</TableHeaderColumn>
-        		<TableHeaderColumn style={{textAlign: 'center'}}>Used</TableHeaderColumn>
-        		<TableHeaderColumn style={{textAlign: 'center'}}>Required</TableHeaderColumn>
-        		<TableHeaderColumn style={{textAlign: 'center'}}>Excess</TableHeaderColumn>
+        		<TableHeaderColumn style={mineralHeader}>Mineral</TableHeaderColumn>
+        		<TableHeaderColumn style={tableHeader}>Used</TableHeaderColumn>
+        		<TableHeaderColumn style={tableHeader}>Required</TableHeaderColumn>
+        		<TableHeaderColumn style={tableHeader}>Excess</TableHeaderColumn>
           </TableRow>
         </TableHeader>
         <TableBody displayRowCheckbox={false} stripedRows={true}>
         {this.createTable()}
         </TableBody>
         </Table>
+        </>
       }
       </>
     )}
@@ -165,19 +180,19 @@ export class Multibuy extends Component {
         <div className="child inline-block-child">
         <Card  initiallyExpanded={true}>
           <CardHeader actAsExpander={true} showExpandableButton={true}
-          title="Multibuy (Minerals)" subtitle={this.state.mineral_price}/>
-            <CardText  expandable={true}> <code> {this.state.minerals} </code> </CardText>
+          title="Multibuy (Minerals)"/>
+            <CardText  expandable={true} style={{textAlign:'left'}}> <code> {this.state.minerals} </code> </CardText>
           </Card>
         </div>&nbsp;
         <div className="child inline-block-child">
         <Card  initiallyExpanded={true}>
         <CardHeader actAsExpander={true} showExpandableButton={true}
         title="Multibuy (Ore)" subtitle={this.state.ore_price}/>
-          <CardText expandable={true}> <code> {this.state.ore} </code> </CardText>
+          <CardText expandable={true} style={{textAlign:'left'}}> <code> {this.state.ore} </code> </CardText>
           </Card>
         </div>
       </div>
-
+      <br/>
       <div className="parent">
         <MaterialTable/>
       </div>
@@ -266,7 +281,7 @@ export class NameForm extends Component {
           break;
 
       case 2:
-        multibuy =  <Multibuy/>;
+        multibuy =  <><h2> Multibuy </h2> <Multibuy/></>;
         break;
 
       default:
@@ -298,6 +313,7 @@ export class NameForm extends Component {
 
           <RaisedButton label="Clear" onClick={this.clearSession.bind(this)} />
       </form>
+      <br/>
       {multibuy}
       <p>{this.state.responseToPost}</p>
 
