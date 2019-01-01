@@ -7,13 +7,9 @@ import TextField from 'material-ui/TextField';
 import {Card, CardHeader, CardText} from 'material-ui/Card';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
-import cookie from "react-cookie";
-import 'whatwg-fetch';
-// import
-// import { withCookies, CookiesProvider, Cookies, cookie } from 'react-cookie';
-// import Cookie from 'react-native-cookie';
+// eslint-disable-next-line
+import {  Table,  TableBody,  TableHeader,  TableHeaderColumn,  TableRow,  TableRowColumn,} from 'material-ui/Table';
 
-// require('electron-cookies');
 
 export const App = () => (
 
@@ -30,6 +26,87 @@ export const App = () => (
   </div>
 );
 
+// async function get_build_price(callback)
+// {
+//
+//     console.log("Getting build prices")
+//     const response = await fetch('http://127.0.0.1:5000/build_price', { credentials: 'include'});
+//     const minerals = response.json();
+//
+//     minerals.then(data => callback(data));
+// }
+
+async function get_material_table(callback)
+{
+
+    console.log("Getting material table")
+    const response = await fetch('http://127.0.0.1:5000/material_table', { credentials: 'include'});
+    const table = response.text();
+
+    const res = table.then(data => callback(JSON.parse(data)));
+    res.then(() => console.log(table));
+}
+
+export class MaterialTable extends Component {
+
+  state  = {}
+
+    componentDidMount() {
+      const self = this;
+      this.setState({table: false});
+
+      get_material_table(table => self.setState( {material_table: table}));
+    }
+
+    createTable() {
+      console.log('Creating table with ' + this.state.material_table);
+      console.log('Element test: ' + this.state.material_table[0][0]);
+      // console.log("Creating table with " + this.state.material_table);
+      let table = []
+      // console.log("Table is " + this.state.material_table)
+
+      // Outer loop to create parent
+      for (let i = 0; i < 8; i++) {
+        let children = []
+        //Inner loop to create children
+        for (let j = 0; j < 4; j++) {
+          let style = {}
+          if (j !== 0){
+            style = {textAlign: 'right'}
+          }
+          children.push(<TableRowColumn key={i*5 + j} style={style}>{`${this.state.material_table[i][j]}`}</TableRowColumn>)
+        }
+        //Create the parent and add the children
+        table.push(<TableRow key={i*5+4}>{children}</TableRow>)
+      }
+
+      // this.setState({table: true});
+      return table
+    }
+
+    render(){
+      return (
+        <>
+      {
+        this.state && this.state.material_table &&
+        <Table  selectable={false} style={{width:500}}>
+        <TableHeader displaySelectAll={false}>
+          <TableRow>
+        		<TableHeaderColumn style={{textAlign: 'left'}}>Mineral</TableHeaderColumn>
+        		<TableHeaderColumn style={{textAlign: 'center'}}>Used</TableHeaderColumn>
+        		<TableHeaderColumn style={{textAlign: 'center'}}>Required</TableHeaderColumn>
+        		<TableHeaderColumn style={{textAlign: 'center'}}>Excess</TableHeaderColumn>
+          </TableRow>
+        </TableHeader>
+        <TableBody displayRowCheckbox={false} stripedRows={true}>
+        {this.createTable()}
+        </TableBody>
+        </Table>
+      }
+      </>
+    )}
+}
+
 
 
 async function get_minerals(callback)
@@ -37,13 +114,9 @@ async function get_minerals(callback)
 
     console.log("Querying mineral multibuy")
     const response = await fetch('http://127.0.0.1:5000/multibuy_minerals', { credentials: 'include'});
-    // console.log(response);
     const minerals = response.json();
-    console.log("Got mineral response" + minerals)
 
-    let mineral_result = minerals.then(data => callback(data));
-
-    mineral_result.then(() => console.log("minerals: " + minerals.json));
+    minerals.then(data => callback(data));
 }
 
 async function get_ore(callback)
@@ -51,15 +124,9 @@ async function get_ore(callback)
 
   console.log("Querying ore multibuy")
   const response = await fetch('http://127.0.0.1:5000/multibuy_ore', { credentials: 'include'});
-  // console.log(response);
   const ore = response.json();
-  const res = ore.then(data => callback(data));
-
-  res.then(() => console.log("ore: " +  ore));
-  // console.log("Got ore response" + ore);
-
+  ore.then(data => callback(data));
 }
-
 
 export class Multibuy extends Component {
 
@@ -70,54 +137,56 @@ export class Multibuy extends Component {
     this.setState({processing:true})
 
     console.log("Clearing session")
-    const result = fetch('http://127.0.0.1:5000/clear', { credentials: 'include'});
-    result.then(response => console.log(response));
-    // delete this.state;
+    fetch('http://127.0.0.1:5000/clear', { credentials: 'include'});
     this.setState({minerals: false, ore: false});
-    // console.log(this);
-
   }
 
   componentDidMount() {
     const self = this;
-    // console.log("Clearing session");
-    // fetch('http://127.0.0.1:5000/clear', { credentials: 'include'});
 
-    // Can't do this until after submit is clicked!
-    // Or, need to get a response first
-    // self.setState({a: "test"});
-    // console.log(this.state);
     get_minerals(data => self.setState({ minerals: data }));
     get_ore(data => self.setState({ ore: data }));
+    // get_material_table(table => self.setState( {material_table: table}));
+    // get_material_table(table => self.setState( {material_table: renderHTML(table)}));
+    // get_build_price(prices => self.setState({ mineral_price: prices.minerals, ore_price: prices.ore }));
   }
 
   render(){
 
+
+    // console.log("Table: " + this.state.material_table);
+
     return(
       <div>
-
       {
         this.state && this.state.minerals && this.state.ore &&
+        <>
       <div className="parent">
         <div className="child inline-block-child">
         <Card  initiallyExpanded={true}>
           <CardHeader actAsExpander={true} showExpandableButton={true}
-          title="Multibuy (Minerals)"/>
+          title="Multibuy (Minerals)" subtitle={this.state.mineral_price}/>
             <CardText  expandable={true}> <code> {this.state.minerals} </code> </CardText>
           </Card>
         </div>&nbsp;
         <div className="child inline-block-child">
         <Card  initiallyExpanded={true}>
         <CardHeader actAsExpander={true} showExpandableButton={true}
-        title="Multibuy (Ore)"/>
+        title="Multibuy (Ore)" subtitle={this.state.ore_price}/>
           <CardText expandable={true}> <code> {this.state.ore} </code> </CardText>
           </Card>
         </div>
       </div>
+
+      <div className="parent">
+        <MaterialTable/>
+      </div>
+      </>
   }
   </div>
 );}}
 
+// <>{this.state.material_table}</>
 export class NameForm extends Component {
   constructor(props) {
     super(props);
@@ -127,7 +196,7 @@ export class NameForm extends Component {
         item_name: '',
         item_quantity: '1',
         responseToPost: '',
-        processing: false,
+        processing: 0,
         minerals: '',
       };
 
@@ -140,10 +209,6 @@ export class NameForm extends Component {
 
     console.log("Sending clear");
     fetch('http://127.0.0.1:5000/clear', { credentials: 'include'});
-
-    // const session = require('electron').remote.session;
-
-
   }
 
   handleChange(event) {
@@ -155,7 +220,7 @@ export class NameForm extends Component {
 
     this.setState({processing:0})
 
-    const result = fetch('http://127.0.0.1:5000/clear', { credentials: 'include'});
+    fetch('http://127.0.0.1:5000/clear', { credentials: 'include'});
 
   }
 
@@ -182,24 +247,32 @@ export class NameForm extends Component {
       body: JSON.stringify(
         { data }),
     });
-    console.log("Response:" + response);
-    // response.then(data => console.log(data));
-    const res = response.then(() => this.setState({ processing: 2}));
-    res.then(() => console.log("cookie is " + document.cookie));
-
-    // this.setState({ processing: true});
+    response.then(() => this.setState({ processing: 2}));
   };
 
   render() {
     let multibuy;
-    if (this.state.processing == 2){
-      multibuy =  <Multibuy/>
-    } else if (this.state.processing == 1){
-      multibuy = "Calculating build costs for " +
-        this.state.item_quantity + "x " +
-        this.state.item_name + "(s)";
-    } else if (this.state.processing == 0){
-      multibuy = "";
+
+    switch (this.state.processing){
+
+      case 0:
+        multibuy = "";
+        break;
+
+      case 1:
+        multibuy = "Calculating build costs for " +
+          this.state.item_quantity + "x " +
+          this.state.item_name + "(s)";
+          break;
+
+      case 2:
+        multibuy =  <Multibuy/>;
+        break;
+
+      default:
+        multibuy = "Error!";
+        break;
+
     }
 
     return (
