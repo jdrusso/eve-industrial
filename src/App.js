@@ -96,8 +96,6 @@ export class Multibuy extends Component {
     return(
       <div>
 
-      <RaisedButton label="Clear" onClick={this.clearSession.bind(this)} />
-
       {
         this.state && this.state.minerals && this.state.ore &&
       <div className="parent">
@@ -153,6 +151,15 @@ export class NameForm extends Component {
   }
 
 
+  clearSession() {
+
+    this.setState({processing:0})
+
+    const result = fetch('http://127.0.0.1:5000/clear', { credentials: 'include'});
+
+  }
+
+
   getMinerals = async() => {
     var minerals = "1x tritanium";
     return minerals;
@@ -160,7 +167,7 @@ export class NameForm extends Component {
 
   handleSubmit = async e => {
     e.preventDefault();
-    this.setState({processing: false})
+    this.setState({processing: 1})
 
     var data = {};
     data.item = this.state.item_name;
@@ -177,7 +184,7 @@ export class NameForm extends Component {
     });
     console.log("Response:" + response);
     // response.then(data => console.log(data));
-    const res = response.then(() => this.setState({ processing: true}));
+    const res = response.then(() => this.setState({ processing: 2}));
     res.then(() => console.log("cookie is " + document.cookie));
 
     // this.setState({ processing: true});
@@ -185,10 +192,14 @@ export class NameForm extends Component {
 
   render() {
     let multibuy;
-    if (this.state.processing){
+    if (this.state.processing == 2){
       multibuy =  <Multibuy/>
-    } else {
-      multibuy = "Test";
+    } else if (this.state.processing == 1){
+      multibuy = "Calculating build costs for " +
+        this.state.item_quantity + "x " +
+        this.state.item_name + "(s)";
+    } else if (this.state.processing == 0){
+      multibuy = "";
     }
 
     return (
@@ -210,8 +221,9 @@ export class NameForm extends Component {
           onChange={e => this.setState({item_quantity: e.target.value})}
           style = {{width: 20, "marginLeft":5, "marginRight":25}}/>
 
-          <RaisedButton type="submit" label="Submit" />
+          <RaisedButton type="submit" label="Submit" style={{marginRight: 15}} />
 
+          <RaisedButton label="Clear" onClick={this.clearSession.bind(this)} />
       </form>
       {multibuy}
       <p>{this.state.responseToPost}</p>
