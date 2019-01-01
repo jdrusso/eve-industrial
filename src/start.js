@@ -23,14 +23,15 @@ function createWindow() {
   )
 
 
-    // var {PythonShell} = require('python-shell')
-    //
-    //
-    // PythonShell.run('./src/engine.py', null, function (err, results) {
-    //   if (err) throw err;
-    //   console.log(results)
-    //   console.log('finished');
-    // });
+    var {PythonShell} = require('python-shell')
+
+
+    // PythonShell.run(process.resourcesPath + '/../public/engine.py', null, function (err, results) {
+    PythonShell.run('public/engine.py', null, function (err, results) {
+      if (err) throw err;
+      console.log(results)
+      console.log('finished');
+    });
 
   mainWindow.on('closed', () => {
     mainWindow = null
