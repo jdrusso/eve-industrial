@@ -17,7 +17,7 @@ CORS(app, supports_credentials=True, resources={r"/*": {"origins": "*"}})
 
 # session = {"item": None, "quantity": None, "multibuy_minerals": None}
 
-shekelator_path = '../../shekelator'
+shekelator_path = './'
 sys.path.append(shekelator_path)
 from shekelator import analyze
 
@@ -157,65 +157,121 @@ def show_post():
 	session["multibuy_ore"] = piped_ore.read()
 	print("ore multibuy obtained: %s" % session["multibuy_ore"])
 
+	piped_prices = parent_conn.recv()
+	session['mineral_names'], session["materials_used"], session["materials_required"], session["materials_excess"] = piped_prices
+	print(piped_prices)
+	# piped_prices.seek(0)
+	# session["materials"] = piped_prices.read()
+	print("materials obtained: %s" % session["materials_used"])
+
 	print("Shekelator finished, %s %d " % (session.sid, id(session)))
 	print("Shekelator: %s" % session)
 	session.modified = True
 
-
-
 	print(session)
-
-
 	return response
 
-@app.route("/multibuy_minerals")
-def multibuy_minerals():
 
-	print("\nAttempting to read minerals\n")
+
+def wait_value(key):
+
+	print("\nAttempting to read %s\n" % key)
 
 	text = ""
 
 	while True:
 		try:
-			text = session["multibuy_minerals"]
+			text = session[key]
 		except KeyError:
 			time.sleep(2.5)
-			# print(session)
 		else:
 			break
 
-	print("Mineral multibuy produced")
+	print("%s produced" % key)
 
-	multibuy_minerals = jsonify(session["multibuy_minerals"])
-	return  multibuy_minerals
+	result = jsonify(session[key])
+	return  result
+
+
+@app.route("/multibuy_minerals")
+def multibuy_minerals():
+
+	result = wait_value('multibuy_minerals')
+
+	return result
 
 @app.route("/multibuy_ore")
 def multibuy_ore():
 
-	print("\nAttempting to read ores\n")
+	result = wait_value('multibuy_ore')
 
-	num = 0
+	return result
 
-	while True:
-		try:
-			temp = session
-			# print(SESSION_COOKIE_NAME)
-			print(' \r', end='')
-			print(temp.sid, end = '\t')
-			print(id(temp), end = '\t')
-			print(temp, end = '')
-			print(" %d attempts" % num, end='\r')
-			num += 1
-			text = temp["multibuy_ore"]
-		except KeyError:
-			time.sleep(2.5)
-		else:
-			break
+@app.route("/material_table")
+def materials_table():
 
-	print("Ore multibuy produced - %s" % session["multibuy_ore"])
+	# response = "<a class='github' href='https://github.com'><b>GitHub</b></a>"
 
-	multibuy_ore = jsonify(session["multibuy_ore"])
-	return  multibuy_ore
+	# response = \
+	# '''<Table  selectable={false}>
+    #   <TableHeader displaySelectAll={false}>
+	# 	    <TableRow>
+    # 			<TableHeaderColumn>Mineral</TableHeaderColumn>
+    # 			<TableHeaderColumn>Used</TableHeaderColumn>
+    # 			<TableHeaderColumn>Required</TableHeaderColumn>
+    # 			<TableHeaderColumn>Excess</TableHeaderColumn>
+  	#     </TableRow>
+    #   </TableHeader>
+    #   <TableBody displayRowCheckbox={false}>
+	#   <TableRow>
+	# 			<TableRowColumn>1</TableRowColumn>
+	# 			<TableRowColumn>1</TableRowColumn>
+	# 			<TableRowColumn>John Smith</TableRowColumn>
+	# 			<TableRowColumn>Employed</TableRowColumn>
+	# </TableRow>
+    #   </TableBody>
+    #   </Table>'''
+
+# 	response = \
+# '''&lt;TableRow&gt;
+# 			&lt;TableRowColumn&gt;1&lt;/TableRowColumn&gt;
+# 			&lt;TableRowColumn&gt;1&lt;/TableRowColumn&gt;
+# 			&lt;TableRowColumn&gt;John Smith&lt;/TableRowColumn&gt;
+# 			&lt;TableRowColumn&gt;Employed&lt;/TableRowColumn&gt;
+# &lt;/TableRow&gt;'''
+
+# 	response = \
+# '''<table>
+# <tr>
+# 	<th>Name</th>
+# 	<th>Favorite Color</th>
+# </tr>
+# <tr>
+# 	<td>Bob</td>
+# 	<td>Yellow</td>
+# </tr>
+# <tr>
+# 	<td>Michelle</td>
+# 	<td>Purple</td>
+# </tr>
+# </table>'''
+
+	response = list(zip(
+		session['mineral_names'],
+		session['materials_used'],
+		session['materials_required'],
+		session['materials_excess']))
+
+	print(response)
+
+	return jsonify(response)
+
+@app.route("/build_price")
+def build_price():
+
+	result = wait_value('build_price')
+	return result
+
 
 @app.route("/get_test", methods=['GET'])
 def hello():
