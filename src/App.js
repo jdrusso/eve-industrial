@@ -7,16 +7,16 @@ import TextField from 'material-ui/TextField';
 import {Card, CardHeader, CardText} from 'material-ui/Card';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
-import axios from 'axios';
-import queryString from 'query-string'
+import cookie from "react-cookie";
+import 'whatwg-fetch';
+// import
+// import { withCookies, CookiesProvider, Cookies, cookie } from 'react-cookie';
+// import Cookie from 'react-native-cookie';
 
-const api = axios.create({
-	withCredentials: true,
-  crossDomain: true
-});
-
+// require('electron-cookies');
 
 export const App = () => (
+
   <div className="App">
     <header className="App-header">
       <img src={logo} className="App-logo" alt="logo" />
@@ -35,38 +35,43 @@ export const App = () => (
 async function get_minerals(callback)
 {
 
-    // console.log("Querying mineral multibuy")
-    const minerals = api.get('http://127.0.0.1:5000/multibuy_minerals');
-    // console.log("Got mineral response")
-    // console.log(minerals);
+    console.log("Querying mineral multibuy")
+    const response = await fetch('http://127.0.0.1:5000/multibuy_minerals', { credentials: 'include'});
+    // console.log(response);
+    const minerals = response.json();
+    console.log("Got mineral response" + minerals)
 
     let mineral_result = minerals.then(data => callback(data));
 
-    // mineral_result.then(() => console.log(minerals.json));
+    mineral_result.then(() => console.log("minerals: " + minerals.json));
 }
 
 async function get_ore(callback)
 {
 
-  // console.log("Querying ore multibuy")
-  const ore = api.get('http://127.0.0.1:5000/multibuy_ore');
+  console.log("Querying ore multibuy")
+  const response = await fetch('http://127.0.0.1:5000/multibuy_ore', { credentials: 'include'});
   // console.log(response);
-  // console.log("Got ore response");
-  // console.log(ore);
-  ore.then(data => callback(data));
+  const ore = response.json();
+  const res = ore.then(data => callback(data));
+
+  res.then(() => console.log("ore: " +  ore));
+  // console.log("Got ore response" + ore);
 
 }
 
 
 export class Multibuy extends Component {
 
-  state = {}
+  state = {processing:false}
 
   clearSession() {
 
+    this.setState({processing:true})
+
     console.log("Clearing session")
-    api.get('http://127.0.0.1:5000/clear');
-    // console.log(this);
+    const result = fetch('http://127.0.0.1:5000/clear', { credentials: 'include'});
+    result.then(response => console.log(response));
     // delete this.state;
     this.setState({minerals: false, ore: false});
     // console.log(this);
@@ -80,8 +85,8 @@ export class Multibuy extends Component {
 
     // Can't do this until after submit is clicked!
     // Or, need to get a response first
-    self.setState({a: "test"});
-    console.log(this.state);
+    // self.setState({a: "test"});
+    // console.log(this.state);
     get_minerals(data => self.setState({ minerals: data }));
     get_ore(data => self.setState({ ore: data }));
   }
@@ -128,11 +133,18 @@ export class NameForm extends Component {
         minerals: '',
       };
 
+
+
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
 
-    api.defaults.withCredentials = true
-    api.get('http://127.0.0.1:5000/clear', {withCredentials: true});
+
+
+    console.log("Sending clear");
+    fetch('http://127.0.0.1:5000/clear', { credentials: 'include'});
+
+    // const session = require('electron').remote.session;
+
 
   }
 
@@ -148,23 +160,36 @@ export class NameForm extends Component {
 
   handleSubmit = async e => {
     e.preventDefault();
+    this.setState({processing: false})
 
-    const post_data = {item: this.state.item_name, quantity: this.state.item_quantity};
-    // data.item = this.state.item_name;
-    // data.quantity = this.state.item_quantity;
+    var data = {};
+    data.item = this.state.item_name;
+    data.quantity = this.state.item_quantity;
     console.log("Sending submit");
+    const response = fetch('http://127.0.0.1:5000/post_test', {
+      credentials: 'include',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(
+        { data }),
+    });
+    console.log("Response:" + response);
+    // response.then(data => console.log(data));
+    const res = response.then(() => this.setState({ processing: true}));
+    res.then(() => console.log("cookie is " + document.cookie));
 
-    api.post('http://127.0.0.1:5000/post_test', post_data);
-    // console.log("Response:");
-    // console.log(response);
-
-    this.setState({responseToPost: "Analyzing manufacturing requirements for  " +
-      this.state.item_quantity + " " + this.state.item_name + "(s)"});
-
-    console.log(this.state)
+    // this.setState({ processing: true});
   };
 
   render() {
+    let multibuy;
+    if (this.state.processing){
+      multibuy =  <Multibuy/>
+    } else {
+      multibuy = "Test";
+    }
 
     return (
       <>
@@ -188,9 +213,10 @@ export class NameForm extends Component {
           <RaisedButton type="submit" label="Submit" />
 
       </form>
+      {multibuy}
       <p>{this.state.responseToPost}</p>
 
-      <Multibuy/>
+
       </>
     );
   }
