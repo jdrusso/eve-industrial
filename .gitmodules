@@ -1,3 +1,6 @@
 [submodule "src/shekelator"]
 	path = src/shekelator
 	url = https://github.com/jdrusso/shekelator
+[submodule "public/shekelator"]
+	path = public/shekelator
+	url = https://github.com/jdrusso/shekelator
