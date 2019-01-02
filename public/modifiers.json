@@ -1,0 +1,37 @@
+{
+  "Skills":{"Reprocessing":5,
+    "Reprocessing Efficiency":5,
+    "Arkonor Processing":4,
+    "Bistot Processing":4,
+    "Crokite Processing":4,
+    "Dark Ochre Processing":4,
+    "Gneiss Processing":4,
+    "Hedbergite Processing":0,
+    "Hemorphite Processing":4,
+    "Jaspet Processing":5,
+    "Kernite Processing":4,
+    "Mercoxit Processing":0,
+    "Omber Processing":5,
+    "Plagioclase Processing":5,
+    "Pyroxeres Processing":4,
+    "Scordite Processing":5,
+    "Spodumain Processing":4,
+    "Veldspar Processing":5,
+    "Ice Processing":0
+  },  
+  "Refinery":{
+    "ME":0.0, 
+    "Security":0.06,
+    "Rig":0.03,
+    "Type":0.02
+  },  
+  "Assembly":{
+    "ME":10.0,
+    "Security":1.9,
+    "Rig":0.02,
+    "Type":0.01,
+    "System":"Basgerin",
+    "Tax":0.10
+  },
+  "Implant":0.04
+}
