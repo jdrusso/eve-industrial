@@ -28,12 +28,12 @@
     "react-start": "BROWSER=none react-scripts start",
     "pack": "build --dir",
     "dist": "npm run build && build",
+    "dist-win": "npm run build --win && build --win",
     "postinstall": "install-app-deps"
   },
   "homepage": "./",
   "main": "src/start.js",
   "build": {
-    "asar":false,
     "appId": "com.electron.electron-shekelator",
     "linux": {
       "target": [
@@ -41,16 +41,13 @@
       ],
       "category":"Utility"
     },
+    "win": {
+     "target": "NSIS"
+    },
     "directories": {
       "buildResources": "public"
     },
-    "extraFiles": ["public/eve_utils.py",
-              "public/modifiers.json",
-              "public/index.html",
-              "public/industryActivityMaterials.csv",
-              "public/engine.py",
-              "public/shekelator/*",
-              "public/shekelator/eve-utils/eve_utils.py"]
+    "extraFiles": ["public/index.html"]
   },
   "eslintConfig": {
     "extends": "react-app"
