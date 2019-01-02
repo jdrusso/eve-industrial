@@ -17,10 +17,10 @@ CORS(app, supports_credentials=True, resources={r"/*": {"origins": "*"}})
 
 import os
 dir = os.path.dirname(os.path.realpath(__file__))
-shekel_path = os.path.join(dir, 'shekelator/')
-sys.path.append(shekel_path)
+krab_path = os.path.join(dir, 'krabby-patty/')
+sys.path.append(krab_path)
 
-from shekelator import analyze
+from krabby_patty import analyze
 
 @app.after_request
 def after_request(response):
@@ -60,7 +60,7 @@ def show_post():
 
     parent_conn, child_conn = Pipe()
 
-    print("Spawning shekelator")
+    print("Spawning krabby patty")
     p = Process(target=analyze, args=(session["item"], session["quantity"], True, child_conn))
     p.start()
 
@@ -83,9 +83,9 @@ def show_post():
 
     piped_prices = parent_conn.recv()
     session['mineral_names'], session["materials_used"], session["materials_required"], session["materials_excess"] = piped_prices
-    print("Materiaals obtained")
+    print("Materials obtained")
 
-    print("Shekelator finished")
+    print("Krabby patty finished")
     session.modified = True
 
     return response
