@@ -24,22 +24,12 @@ function createWindow() {
       })
   )
 
-
-    // console.log("Starting shell")
-    // console.log(process.resourcesPath + '/app/build/engine')
-
-    // var {PythonShell} = require('python-shell')
-
-
-    // PythonShell.run(process.resourcesPath + '/../public/engine.py', null, function (err, results) {
-    // PythonShell.run(process.resourcesPath + '/../../../../public/engine.py', null, function (err, results) {
-    // PythonShell.run(process.resourcesPath + '/../public/engine', null, function (err, results) {
-    //   if (err) throw err;
-    //   console.log(results)
-    //   console.log('finished');
-    // });
-
-    // console.log("Shell started")
+  console.log(process.resourcesPath + '/../public/engine')
+  let serverProc = require('child_process').execFile(process.resourcesPath + '/../public/engine')
+  serverProc.stdout.on('data', function(data) {
+      console.log(data.toString());
+  // console.log(serverProc)
+});
 
   mainWindow.on('closed', () => {
     mainWindow = null
