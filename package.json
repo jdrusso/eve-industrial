@@ -1,10 +1,10 @@
 {
-  "name": "Shekelator",
+  "name": "Mr_Krabs_ISK_Printer",
   "author": {
     "name": "Jesus Rambo",
     "email": "thejesusrambo@gmail.com"
   },
-  "description":"Shekelator desktop app",
+  "description":"Frontend for Mr. Krab's ISK Printer script",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -34,7 +34,7 @@
   "homepage": "./",
   "main": "src/start.js",
   "build": {
-    "appId": "com.electron.electron-shekelator",
+    "appId": "com.krabs.isk-printer",
     "linux": {
       "target": [
         "AppImage"

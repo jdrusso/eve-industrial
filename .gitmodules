@@ -1,3 +1,3 @@
-[submodule "src/shekelator"]
-	path = src/shekelator
-	url = https://github.com/jdrusso/shekelator
+[submodule "public/krabby-patty"]
+	path = public/krabby-patty
+	url = https://github.com/jdrusso/krabby-patty

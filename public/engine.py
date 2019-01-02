@@ -83,7 +83,7 @@ def show_post():
 
     piped_prices = parent_conn.recv()
     session['mineral_names'], session["materials_used"], session["materials_required"], session["materials_excess"] = piped_prices
-    print("Materials obtained")
+    print("Materiavim ls obtained")
 
     print("Krabby patty finished")
     session.modified = True
