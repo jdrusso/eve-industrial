@@ -11,27 +11,36 @@ function createWindow() {
   mainWindow = new BrowserWindow({ width: 800, height: 600 })
 
   // mainWindow.setMenu(null);
-  // mainWindow.setMenuBarVisibility(false);
+  mainWindow.setMenuBarVisibility(true);
+
+  console.log(process.env.ELECTRON_START_URL)
+  console.log(__dirname)
 
   mainWindow.loadURL(
     process.env.ELECTRON_START_URL ||
       url.format({
-        pathname: path.join(__dirname, '/../src/index.html'),
+        pathname: path.join(__dirname, '/index.html'),
         protocol: 'file:',
         slashes: true
       })
   )
 
 
+    console.log("Starting shell")
+    console.log(process.resourcesPath + '/app/build/engine.py')
+
     var {PythonShell} = require('python-shell')
 
 
     // PythonShell.run(process.resourcesPath + '/../public/engine.py', null, function (err, results) {
-    PythonShell.run('public/engine.py', null, function (err, results) {
+    // PythonShell.run(process.resourcesPath + '/../../../../public/engine.py', null, function (err, results) {
+    PythonShell.run(process.resourcesPath + '/app/build/engine.py', null, function (err, results) {
       if (err) throw err;
       console.log(results)
       console.log('finished');
     });
+
+    console.log("Shell started")
 
   mainWindow.on('closed', () => {
     mainWindow = null

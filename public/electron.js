@@ -1,0 +1,1 @@
+/home/jd/projects/app/src/start.js
